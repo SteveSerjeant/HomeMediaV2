@@ -1,61 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+    <link rel="stylesheet" href="../css/register.css" type="text/css">
+    <!--bootstrap css for alerts-->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+    <link rel="stylesheet" href="../css/forAlerts.css" type="text/css">
 
+</head>
+<body>
 <?php
 
-//database details
-$DATABASE_HOST = 'localhost';
-$DATABASE_USER = 'root';
-$DATABASE_PASS = 'mysql';
-$DATABASE_NAME = 'homemediav2';
+$error = (isset($_GET["err"])) ? base64_decode($_GET["err"]) : "";
+if ($error == "wrongUser") {echo "<div class=\"alert alert-danger alert-dismissible\" role=\"alert\" id=\"banner\"><button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button><strong>ERROR:</strong>      Username Already Exists</div>";}
 
-// attempt connection
-$conn = mysqli_connect($DATABASE_HOST, $DATABASE_USER, $DATABASE_PASS, $DATABASE_NAME);
-if (mysqli_connect_errno()) {
-    // If there is an error with the connection, stop the script and display the error.
-    exit('Failed to connect to MySQL: ' . mysqli_connect_error());
-}
-
-// check data submitted
-if (!isset($_POST['username'], $_POST['password'], $_POST['email'])) {
-    // Could not get the data that should have been sent.
-    //exit('Please complete the registration form!');
-}
-
-if (empty($_POST['username']) || empty($_POST['password']) || empty($_POST['email'])) {
-    //exit('Please complete the registration form');
-}
-
-//to check if selected userName exists
-if ($stmt = $conn->prepare('SELECT userID, passCode FROM users WHERE userName =?')) {
-    $stmt->bind_param('s', $_POST['username']);
-    $stmt->execute();
-    $stmt->store_result();
-
-    if ($stmt->num_rows > 0){
-        //username already exists
-        echo 'Username already exists, please choose another.';
-    } else
-
-        //insert new account code
-        // Username doesnt exists, insert new account
-        if ($stmt = $conn->prepare('INSERT INTO users (userName, passCode, email) VALUES (?, ?, ?)')) {
-            // We do not want to expose passwords in our database, so hash the password and use password_verify when a user logs in.
-            $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-            $stmt->bind_param('sss', $_POST['username'], $password, $_POST['email']);
-            $stmt->execute();
-            echo 'You have successfully registered, you can now login!';
-        } else {
-            // Something is wrong with the sql statement, check to make sure accounts table exists with all 3 fields.
-            echo 'Could not prepare statement! line 48';
-        }
-
-
-    $stmt->close();
-
-} else {
-    // Something is wrong with the sql statement, check to make sure accounts table exists with all 3 fields.
-    echo 'Could not prepare statement! line 56';
-}
-
-$conn->close()
 
 ?>
+
+<div class = "register">
+    <h1> To Register</h1>
+    <form action="regComplete.php" method="post" autocomplete="off">
+
+        <label for="username">
+            <i class = "fas fa-user"></i>
+        </label>
+        <input type="text" name="username" placeholder="Username" id="username" required>
+
+        <label for="password">
+            <i class = "fas fa-lock"></i>
+        </label>
+        <input type="password" name="password" placeholder="Password" id="password" required>
+
+        <label for="email">
+            <i class="fas fa-envelope"></i>
+        </label>
+        <input type="email" name="email" placeholder="Email" id="email" required>
+
+        <input type="submit" value="Register">
+    </form>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+<script src="../javascript/for-alerts.js"></script>
+
+</body>
+</html>
